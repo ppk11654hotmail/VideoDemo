@@ -1,34 +1,38 @@
-﻿@model IEnumerable<VideoDemo.Models.Video>
+﻿@* 檢視中所要呈現的資料模型為何， 本案例是先前實作的 Video 類別。 而 IEnumerable<> 表示檢視資料來源不是單一的資料模型， 而是該資料模型的集合 *@
+@model IEnumerable<VideoDemo.Models.Video>
 
 @{
     ViewBag.Title = "影片維護頁";
 }
-
+@* 下述程式碼表明會以 Telerik UI for ASP.NET MVC 的 Grid 元件來呈現（ 比較切實的講法是產出 HTML、 CSS、 JavaScript 的組合） 頁面 *@
+@* 資料來源為檢視最前頭以 @model 所定義的型別， 而元件的名稱命名為 Videos  *@
 @(Html.Kendo().Grid(Model)
       .Name("Videos")
-      .Columns(c =>
+      .Columns(c =>     //指定 Grid 每一個行（ Colums） 所要繫結資料模型的屬性
       {
-          c.Command(p => p.Edit().Text("編輯"));
+          c.Command(p => p.Edit().Text("編輯")); //行（ Colums） 上要放置一個【編輯】 按鈕， 按下該按鈕會執行該列（ Row） 資料的編輯
           c.Bound(p => p.Id).Width(310);
           c.Bound(p => p.Title);
           c.Bound(p => p.StartDate);
           c.Bound(p => p.EndDate);
           c.Command(p => p.Destroy().Text("刪除"));
       })
-      .ToolBar(toolbar => toolbar.Create().Text("新增"))
-      .Editable(e => e.Mode(GridEditMode.PopUp))
-      .DataSource(d => d
+      .ToolBar(toolbar => toolbar.Create().Text("新增")) //在 Grid 的工具列（ Toolbar） 上要放置一個【新增】 按鈕， 按下該按鈕會執行新增一筆資料
+      .Editable(e => e.Mode(GridEditMode.PopUp)) //表明該 Grid 元件是為可編輯（ 非只是呈現資料的唯讀） 其編輯模式為跳出一個浮動頁面以供編輯（ 也可以類似 Excel 的方式直接編輯
+      .DataSource(d => d  //指定該 Grid 元件的資料來源， 其中 .Server() 指明資料的處理是在伺服器端（ 也有使用者端透過 Ajax 操作處理
       .Server()
-      .Model(m =>
+      .Model(m =>         //{.Model(m => {}) 表明該 Grid 使用的資料模型的主鍵值名稱（ 本案例是 Id） 以及各個欄位新增時的預設值（ 本案例是開始日期為新增資料的當天， 結束日期為 1 5 天之後） 。
       {
-          m.Id("Id");
-          m.Field(f => f.StartDate).DefaultValue(DateTime.Today);
+          m.Id("Id");     //主鍵值名稱
+          m.Field(f => f.StartDate).DefaultValue(DateTime.Today);   //新增時的預設值
           m.Field(f => f.EndDate).DefaultValue(DateTime.Today.AddDays(15));
-      })
-     .Create("Create", "Videos")
+      })      
+     .Create("Create", "Videos")  //Create("Create", "Videos") 指示新增資料之後會被 POST 到 VideosController 的 Create 方法去處理。 而 .Update("Update", "Videos") 和.Destroy("Delete", "Videos") 同樣也是指示要來處理修改和刪除的方法。
      .Update("Edit", "Videos")
      .Destroy("Delete", "Videos"))
 )
+@* 為頁面加入 jquery.validate.js 和 jquery.validate.unobtrusive.js 的引用， 這使得在前端的資料維護， 用來驗證使用者的輸入是否符合
+    規則 *@
 @section scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }
