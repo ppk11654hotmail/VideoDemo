@@ -12,6 +12,7 @@ namespace VideoDemo.Controllers
         private VideoContext db = new VideoContext();
         public ActionResult Index()
         {
+            //維護完的影片 ， 需要依所設定的日期期限 LINQ 語法隨機取出一部合於日期期限的影片 在首頁顯示 提示 : 條件直接寫在控制器方法中， 這樣的寫法耦合度太高不利於將來的單元測試
             var model =
             db.Videos
                 .Where(e => e.StartDate <= DateTime.Today &&
